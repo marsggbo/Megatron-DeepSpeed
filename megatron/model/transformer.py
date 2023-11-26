@@ -644,7 +644,7 @@ class ParallelAttention(MegatronModule):
                                      head_dim)
                                      
     def split_tensor(self, mixed_x_layer):
-        query_layer = mixed_x_layer[:, :, :, :-2, :].reshape(mixed_x_layer.shape[:-1] + (-1, self.hidden_size_per_attention_head))
+        query_layer = mixed_x_layer[:, :, :, :-2, :].reshape(mixed_x_layer.shape[:-2] + (-1, self.hidden_size_per_attention_head))
         key_layer = mixed_x_layer[:, :, :, -2, :]
         value_layer = mixed_x_layer[:, :, :, -1, :]
 
@@ -680,6 +680,7 @@ class ParallelAttention(MegatronModule):
 
         if self.attention_type == AttnType.self_attn:
             # Attention heads [sq, b, h] --> [sq, b, ((nq + 2 * nkv) * hn)]
+            # nq表示单个head对应query的dimension，nkv表示单个head对应key的dimension（value相同）
             mixed_x_layer, _ = self.query_key_value(hidden_states)
 
             # [sq, b, ((nq + 2 * nkv) * hn)] --> [sq, b, nkv, (nq // nkv + 2), hn]
@@ -689,7 +690,7 @@ class ParallelAttention(MegatronModule):
             mixed_x_layer = mixed_x_layer.view(*new_tensor_shape)
 
             # [sq, b, nkv, (nq // nkv + 2), hn] --> 3 [sq, b, np, hn]
-            (query_layer
+            (query_layer,
              key_layer,
              value_layer) = self.split_tensor(mixed_x_layer)
 
