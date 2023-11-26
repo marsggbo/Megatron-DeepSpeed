@@ -4,10 +4,10 @@
 
 export CUDA_DEVICE_MAX_CONNECTIONS=1
 
-CHECKPOINT_PATH=<Specify path>
-VOCAB_FILE=<Specify path to file>/gpt2-vocab.json
-MERGE_FILE=<Specify path to file>/gpt2-merges.txt
-DATA_PATH=<Specify path and file prefix>_text_document
+CHECKPOINT_PATH=/home/nus-hx/code/Megatron-DeepSpeed/logs
+VOCAB_FILE=/home/nus-hx/code/Megatron-DeepSpeed/dataset/gpt2_merge_vocab/gpt2-vocab.json
+MERGE_FILE=/home/nus-hx/code/Megatron-DeepSpeed/dataset/gpt2_merge_vocab/gpt2-merges.txt
+DATA_PATH=/home/nus-hx/code/Megatron-DeepSpeed/dataset/Wikipedia/processed4gpt/gpt2_text_document
 
 GPT_ARGS="
     --num-layers 24 \
@@ -25,7 +25,8 @@ GPT_ARGS="
     --weight-decay 1e-2 \
     --lr-warmup-fraction .01 \
     --clip-grad 1.0 \
-    --fp16
+    --fp16 \
+    --no-gradient-accumulation-fusion
 "
 
 DATA_ARGS="
@@ -43,9 +44,10 @@ OUTPUT_ARGS="
     --eval-iters 10
 "
 
-torchrun pretrain_gpt.py \
+torchrun --master_port=6688 pretrain_gpt.py \
     $GPT_ARGS \
     $DATA_ARGS \
     $OUTPUT_ARGS \
     --save $CHECKPOINT_PATH \
-    --load $CHECKPOINT_PATH
+    --load $CHECKPOINT_PATH \
+    $@
