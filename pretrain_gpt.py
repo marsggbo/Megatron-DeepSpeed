@@ -251,6 +251,9 @@ def calculate_mos_loss(args, stu_output, teacher_model, tokens, position_ids, at
 def forward_step(data_iterator, model):
     """Forward step."""
     args = get_args()
+    if args.ipdb:
+        from ipdb import set_trace
+        set_trace()
     timers = get_timers()
 
     # Get the batch.

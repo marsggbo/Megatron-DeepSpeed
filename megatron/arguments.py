@@ -661,6 +661,8 @@ def _add_logging_args(parser):
 
     group.add_argument('--log-params-norm', action='store_true',
                        help='If set, calculate and log parameters norm.')
+    group.add_argument('--ipdb', action='store_true',
+                       help='using ipdb to debug.')
     group.add_argument('--log-num-zeros-in-grad', action='store_true',
                        help='If set, calculate and log the number of zeros in gradient.')
     group.add_argument('--timing-log-level', type=int,
